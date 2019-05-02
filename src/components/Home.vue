@@ -11,8 +11,9 @@
                 fixed="right"
                 label=""
                 width="100">
+
             <template slot-scope="scope">
-                <el-button @click="read(result.articles[0]._id)" type="text" size="small">read</el-button>
+                <el-button @click="read(scope.row._id)" type="text" size="small">read</el-button>
 
             </template>
         </el-table-column>

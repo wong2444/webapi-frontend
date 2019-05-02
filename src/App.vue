@@ -10,8 +10,12 @@
                     </el-menu-item>
                     <el-menu-item index="3" v-if="flag">
                         <router-link to="/login">Login</router-link>
-                    </el-menu-item>
 
+                    </el-menu-item>
+                    <el-menu-item index="4" v-if="flag">
+                        <router-link to="/register">Register</router-link>
+
+                    </el-menu-item>
                     <el-submenu index="2" v-if="!flag">
                         <template slot="title">{{name}}</template>
                         <el-menu-item index="2-1">favorite</el-menu-item>
@@ -81,9 +85,10 @@
             },
             logout() {
                 localStorage.setItem("token", '');
-                localStorage.setItem("userId", '');
+                localStorage.setItem("userId", '123456');
                 localStorage.setItem("name", '');
                 this.flag = true;
+                this.$router.push({path: '/home'})
             }
         },
         mounted() {

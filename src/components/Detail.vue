@@ -1,25 +1,29 @@
 <template>
     <el-card class="box-card">
         <div slot="header" class="clearfix">
-            <span><h1>{{result.article.title}}</h1></span>
+            <span><h1>{{result.article.title}}</h1>
+                </span>
             <span><span style="float: left;color: gray">{{result.article.author.name}}</span>       <span
                     style="float: right;color: gray">{{result.article.create_date}}</span> </span>
 
         </div>
         <div style="float: left;display: flow-root">
             <span>{{result.article.body}}
-
-
-            <el-button v-if="flag" type="primary" size="mini" icon="el-icon-edit" circle
-                       @click="editArticle()"></el-button>
-
-            </span>
-
-            <span v-if="result.article.is_update" style="font-size: xx-small;color: grey">
+ <span v-if="result.article.is_update" style="font-size: xx-small;color: grey">
 
                     [edit at {{result.article.update_date}}]
 
                 </span>
+
+            <el-button v-if="flag" type="primary" size="mini" icon="el-icon-edit" circle
+                       @click="editArticle()"></el-button>
+                <!--<el-button type="warning" icon="el-icon-star-on" size="mini" circle v-if="isFavor()"-->
+                           <!--@click="removeFavour()"></el-button>-->
+                <!--<el-button type="warning" icon="el-icon-star-off" size="mini" circle v-if="!isFavor()"-->
+                           <!--@click="addFavour()"></el-button>-->
+            </span>
+
+
             <br/>
             <br/>
 
@@ -29,10 +33,10 @@
                     <li v-for="(item,key) in result.article.comments" v-model="result">
                         <span>{{item.author.name}}: </span>
                         <span>{{item.body}}</span>
-                        <span v-if="item._id">
-                            <el-button type="primary" size="mini"
-                                       icon="el-icon-edit" circle
-                                       @click="editComment(item._id,item.body)"></el-button>
+                        <span v-if="isAuthor(item.author._id)">
+                        <el-button type="primary" size="mini"
+                                   icon="el-icon-edit" circle
+                                   @click="editComment(item._id,item.body)"></el-button>
                         </span>
                     </li>
                     <li v-if="result.article.comments.length===0">
@@ -65,7 +69,7 @@
             return {
                 result: {},
                 flag: true,
-
+                cflag: true,
                 comment: {}
             }
         },
@@ -103,6 +107,7 @@
                 }, {headers}).then(res => {
                     this.result = res.data;
                     this.$message(res.data.message);
+                    this.$router.go(0)
 
                 }, res => {
                     console.log(res)
@@ -116,6 +121,43 @@
                         commentId: commentId,
                         articleId: this.result.article._id
                     }
+                })
+            }, isAuthor(authorId) {
+                if (authorId !== localStorage.getItem('userId')) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }, isFavor() {
+
+                if (JSON.parse(localStorage.getItem('favList')).includes(this.result.article._id)) {
+                    return true
+                } else {
+                    return false
+                }
+            }, addFavour() {
+                let headers = {};
+                headers['Authorization'] = 'Bearer ' + localStorage.getItem("token");
+                this.$http.post("http://127.0.0.1:3000/user/" + this.result.article._id, {}, {headers}).then(res => {
+                    this.result = res.data;
+                    this.$message(res.data.message);
+
+
+                }, res => {
+                    console.log(res)
+                    this.$message(res.data.message);
+                })
+            }, removeFavour() {
+                let headers = {};
+                headers['Authorization'] = 'Bearer ' + localStorage.getItem("token");
+                this.$http.delete("http://127.0.0.1:3000/user/" + this.result.article._id, {}, {headers}).then(res => {
+                    this.result = res.data;
+                    this.$message(res.data.message);
+
+
+                }, res => {
+                    console.log(res)
+                    this.$message(res.data.message);
                 })
             }
         },
